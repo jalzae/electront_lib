@@ -1,7 +1,31 @@
-/**
- * This file is loaded via the <script> tag in the index.html file and will
- * be executed in the renderer process for that window. No Node.js APIs are
- * available in this process because `nodeIntegration` is turned off and
- * `contextIsolation` is turned on. Use the contextBridge API in `preload.js`
- * to expose Node.js functionality from the main process.
- */
+const { ipcRenderer } = require('electron');
+const Swal = require('sweetalert2');
+
+document.addEventListener('DOMContentLoaded', () => {
+  let disable = document.getElementById('disable');
+  disable.addEventListener('click', (event) => {
+    Swal.fire({
+      title: 'Alert',
+      text: 'message',
+      icon: 'info',
+      confirmButtonText: 'OK'
+    });
+
+    ipcRenderer.send('disableMouseEvents');
+    event.sender.send('showAlert', 'Mouse Events Disabled on Current Window');
+
+  });
+
+  let forward = document.getElementById('forward');
+  forward.addEventListener('mouseenter', () => {
+    console.log('Mouse Entered the Region...Disabling Click');
+    ipcRenderer.send('enableForwardMouseEvents');
+  });
+
+  forward.addEventListener('mouseleave', () => {
+    console.log('Mouse Left the Region...Event Emitted');
+    ipcRenderer.send('disableForwardMouseEvents');
+  });
+});
+
+
